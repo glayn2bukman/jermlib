@@ -1,0 +1,22 @@
+/*all classnames and IDs have the "Jerm" prefix to make them unique to any user-denied classes and IDs
+ that might share a name(due to logical reasons)
+*/
+
+/*define some custom fonts...*/
+@font-face {
+    font-family:DejaVuSans-ExtraLight;
+    src:url("fonts/DejaVuSans-ExtraLight.ttf");
+}
+
+body {
+    font-size:100%;
+}
+
+.jermMenu {background-color:#ccc;}
+
+.jermMenuItem:hover, .jermCollapse:hover {cursor:pointer;}
+
+.jermTabbedPanel {}
+.jermTabbedPanelItem {
+    font-family:DejaVuSans-ExtraLight;
+}

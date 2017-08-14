@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Jerm-Lib Test</title>
+        
+        <link rel="stylesheet" href="jermlib.css"/>
+        <script src="jermlib.js"></script>
+        
+        <script>
+            function insertMenuItem(menuIndex, menuItemLabel, position)
+            {
+                var menu = document.getElementsByClassName("jermMenu")[menuIndex];
+                var menuitem = document.createElement("div");
+                menuitem.innerHTML = menuItemLabel;
+                
+                jermInsertMenuItem(menu, menuitem, position); // if position==null, it will be -1 in  jermInsertMenuItem
+            }
+            function insertTab(tabbedPanelIndex, tabtitle, tabContent, position)
+            {
+                var tabbed_panel = document.getElementsByClassName("jermTabbedPanel")[tabbedPanelIndex];
+                var tab = document.createElement("div");
+                tab.innerHTML = tabContent;
+                tab.title = tabtitle;
+                tab.style.backgroundColor = "#aaa";
+                
+                // if position==null, it will be -1 in  jermInsertMenuItem
+                // autofocus is set to true here so that the new tab is automatically focused
+                jermInsertTab(tabbed_panel, tab, position, true); 
+            }
+            function removeTab(tabbedPanelIndex, position)
+            {
+                var tabbed_panel = document.getElementsByClassName("jermTabbedPanel")[tabbedPanelIndex];
+                jermRemoveTab(tabbed_panel, position);
+            }
+            function removeMenuItem(menuIndex, position)
+            {
+                var menu = document.getElementsByClassName("jermMenu")[menuIndex];
+                jermRemoveMenuItem(menu, position);
+            }
+
+            function removeMyTab()
+            {
+                var index = document.getElementById("tabindex_r").value;
+                
+                if (index==""){alert("Enter index of tab to remove please"); return 0;}
+                
+                removeTab(0, index);
+            }
+            function insertMyTab()
+            {
+                var index = document.getElementById("tabindex").value;
+                var title = document.getElementById("tabtitle").value;
+                var content = document.getElementById("tabcontent").value;
+                
+                if (index=="" || title=="" || content==""){alert("Fill in all fields please"); return 0;}
+            
+                insertTab(0, title, content, index, true);
+            }
+            function insertMyMenu1Item(i)
+            {
+                var index = document.getElementById("menuindex"+i).value;
+                var title = document.getElementById("menuitem"+i).value;
+                
+                if (index=="" || title==""){alert("Fill in all fields please"); return 0;}
+                
+                insertMenuItem(i, title, index);
+            }
+            function removeMyMenu1Item(i)
+            {
+                var index = document.getElementById("menuindex_r"+i).value;
+                
+                if (index==""){alert("Fill in the menu-item index please"); return 0;}
+                
+                removeMenuItem(i, index);
+            }
+            
+            window.onload = function (){ jermlibInitAll(); }
+        </script>
+        
+        <style>
+            #verticalMenu {width:20%;}
+            .collapses {background-color:#521063;}
+            
+            #tabbedPanel {position:absolute; width:40%; height:50%}
+            
+            .alignText {text-align:center;}
+        </style>
+        
+    </head>
+    
+    <body>
+        <p>
+            <input type="text" id="menuitem0" placeholder="menu item label" />
+            <input type="number" id="menuindex0" placeholder="index(-1 -> append)"/>
+            <input type="button" value="add menu item" onclick="insertMyMenu1Item(0)"/>
+        </p>
+        <p>
+            <input type="number" id="menuindex_r0" placeholder="menu item index"/>
+            <input type="button" value="remove tab" onclick="removeMyMenu1Item(0)"/>
+        </p>
+        <div class="jermMenu" orientation="horizontal" 
+         enlargeActive="true" separator="true" activeColor="#009494" activeBg="#ddd">
+            <div>File</div>
+            <div>Edit</div>
+            <div>Search</div>
+            <div>View</div>
+            <div>Encoding</div>
+            <div>Language</div>
+            <div>Settings</div>
+            <div>Help</div>
+        </div>
+        
+        <br><br>        
+        
+        <p>
+            <input type="text" id="menuitem1" placeholder="menu item label" />
+            <input type="number" id="menuindex1" placeholder="index(-1 -> append)"/>
+            <input type="button" value="add menu item" onclick="insertMyMenu1Item(1)"/>
+        </p>
+        <p>
+            <input type="number" id="menuindex_r1" placeholder="menu item index"/>
+            <input type="button" value="remove tab" onclick="removeMyMenu1Item(1)"/>
+        </p>
+        <div id="verticalMenu" class="jermMenu" orientation="vertical" itemAlign="center"
+         enlargeActive="true" separator="true" activeColor="#940094">
+            <div>File</div>
+            <div>Edit</div>
+            <div>Search</div>
+            <div>View</div>
+            <div>Encoding</div>
+            <div>Language</div>
+            <div>Settings</div>
+            <div>Help</div>
+        </div>
+
+        <br><br>        
+        
+        <div class="jermCollapse" for="collapse1" group="testCollapses">Collapse 1</div>
+            <div class="collapses" id="collapse1">collapse 1<br>div</div>
+        <div class="jermCollapse" for="collapse2" group="testCollapses">Collapse 2</div>
+            <div class="collapses" id="collapse2">collapse 2<br>div</div>
+        <div class="jermCollapse" for="collapse3" group="testCollapses" collapsed="false">Collapse 3</div>
+            <div class="collapses" id="collapse3">collapse 3<br>div</div>
+        <div class="jermCollapse" for="collapse4" group="testCollapses">Collapse 4</div>
+            <div class="collapses" id="collapse4">collapse 4<br>div</div>
+        <div class="jermCollapse" for="collapse5">Collapse 5</div>
+            <div class="collapses" id="collapse5">collapse 5<br>div</div>
+        
+        <br><br>        
+
+        <p>
+            <input type="text" id="tabtitle" placeholder="tab title" />
+            <input type="text" id="tabcontent" placeholder="tab content" />
+            <input type="number" id="tabindex" placeholder="index(-1 -> append)"/>
+            <input type="button" value="add tab" onclick="insertMyTab()"/>
+        </p>
+        <p>
+            <input type="number" id="tabindex_r" placeholder="tab index"/>
+            <input type="button" value="remove tab" onclick="removeMyTab()"/>
+        </p>
+
+        <div id="tabbedPanel" class="jermTabbedPanel"  activeColor="#009494" 
+         activeBg="#ddd" defaultTab="Tab 3" roundEdges="true">
+            <!-- u wanna give each tab-item element a "title" tag. this will be the title of the tab-->
+            <div title="Tab 1" class="alignText" style="background-color:#f0f;">Tab 1 contents...</div>
+            <div title="Tab 2" class="alignText" style="background-color:#f00;">Tab 2 contents...</div>
+            <div title="Tab 3" class="alignText" style="background-color:#0f0;">Tab 3 contents...</div>
+            <div title="Tab 4" class="alignText" style="background-color:#00f;">Tab 4 contents...</div>
+            <div title="Tab 5" class="alignText" style="background-color:#ff0;">Tab 5 contents...</div>
+        </div>
+        
+        </body>
+    
+</html>
