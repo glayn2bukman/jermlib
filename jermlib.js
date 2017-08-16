@@ -576,9 +576,13 @@ function jermGaugeBarColor(color1, color2)
 }
 function jermGaugeLabelColor(color)
 {
-    if (color==null){return 0;}
-    
+    if (color==null){return 0;}    
     this.labelElement.style.color = color;
+}
+function jermGaugeBorderColor(color)
+{
+    if (color==null){return 0;}    
+    this.gaugeContainer.style.borderColor = color;
 }
 
 function jermGauge(data)
@@ -650,6 +654,7 @@ function jermGauge(data)
     data.orientation = data.orientation || "horizontal";
 
     data.borderRadius = data.borderRadius || "0px";
+    data.borderColor = data.borderColor || "#aaa";
     data.minValue = data.minValue || 0;
     data.maxValue = data.maxValue || 100;
     data.increment = data.increment || 1;
@@ -679,6 +684,7 @@ function jermGauge(data)
     data.setColor = jermGaugeColor;
     data.setLabelColor = jermGaugeLabelColor;
     data.setBarColor = jermGaugeBarColor;
+    data.setBorderColor = jermGaugeBorderColor;
 
 
     // gauge.mom
@@ -693,6 +699,7 @@ function jermGauge(data)
     data.gaugeContainer.style.height = "100%";
     data.gaugeContainer.style.border = "1px solid";
     data.gaugeContainer.style.borderRadius = data.borderRadius;
+    data.gaugeContainer.style.borderColor = data.borderColor;
 
     if ((typeof data.color)=="string")
     {
