@@ -9,6 +9,26 @@
 var JERM_COPPASE_DATA={};
 var JERM_TABITEM_ACTIVE_COLOR = "#009494";
 var JERM_TABITEM_ACTIVE_BG = "#ccc";
+var JERM_TAB_RADIUS = "20px";
+
+// this is used to create custom event-handlers...eg onchangestate for the jermSwitch
+var JERM_HANDLER_STR = "try{{0}();}catch(e){console.warn(\"jermHandlerError:{0} is NOT a function!\");}";
+
+var JERM_HANDLER = "jermDummyFunction";
+
+// basic functions to compliment javascript
+String.prototype.format = function() {
+    // enable string formatting with "{i}".format(*args)
+    var formatted = this;
+    for (var i = 0; i < arguments.length; i++) {
+        var regexp = new RegExp('\\{'+i+'\\}', 'gi');
+        formatted = formatted.replace(regexp, arguments[i]);
+    }
+    return formatted;
+};
+
+function jermDummyFunction(){} // just a dummy function (default event-handler)
+
 
 // menus
 function jerm_entered_menu_item_handler()
@@ -288,6 +308,7 @@ function jermInitTabbedPanel()
         var active_color = tabbed_panels[i].getAttribute("activeColor") || JERM_TABITEM_ACTIVE_COLOR;
         var active_bg = tabbed_panels[i].getAttribute("activeBg") || JERM_TABITEM_ACTIVE_BG;
         var round_edges = tabbed_panels[i].getAttribute("roundEdges") || "false";
+        var borderRadius = tabbed_panels[i].getAttribute("borderRadius") || JERM_TAB_RADIUS;
         
         var titles = document.createElement("div");
         titles.setAttribute("separator","true");
@@ -322,7 +343,7 @@ function jermInitTabbedPanel()
             title.jerm_color = title.style.color
 
             title.setAttribute("class",title.getAttribute("class")+" jermTabbedPanelItem");
-            if (round_edges=="true"){title.style.borderRadius="20px";}
+            if (round_edges=="true"){title.style.borderRadius=borderRadius;}
             
             titles.appendChild(title);
             
@@ -379,6 +400,7 @@ function jermInsertTab(tabbedPanelElement, tabElement, index, autofocus)
     var active_color = tabbedPanelElement.getAttribute("activeColor") || JERM_TABITEM_ACTIVE_COLOR;
     var active_bg = tabbedPanelElement.getAttribute("activeBg") || JERM_TABITEM_ACTIVE_BG;
     var round_edges = tabbedPanelElement.getAttribute("roundEdges") || "false";
+    var borderRadius = tabbedPanelElement.getAttribute("borderRadius") || JERM_TAB_RADIUS;
         
         
     var title = document.createElement("input");
@@ -392,7 +414,7 @@ function jermInsertTab(tabbedPanelElement, tabElement, index, autofocus)
     title.mom = tabbedPanelElement.children[0];
 
     title.setAttribute("class",title.getAttribute("class")+" jermTabbedPanelItem");
-    if (round_edges=="true"){title.style.borderRadius="20px";}
+    if (round_edges=="true"){title.style.borderRadius=borderRadius;}
     
     title.style.float = "left";
     title.style.height = "99%";
@@ -594,6 +616,8 @@ function jermGauge(data)
         bar: gauge.barElement
         label: gauge.labelElement
 
+    NB: you wann set the dimensions(width n height) of the containing element in pixels!
+
     */
 {
 /*
@@ -700,6 +724,7 @@ function jermGauge(data)
     data.gaugeContainer.style.border = "1px solid";
     data.gaugeContainer.style.borderRadius = data.borderRadius;
     data.gaugeContainer.style.borderColor = data.borderColor;
+    
 
     if ((typeof data.color)=="string")
     {
@@ -771,10 +796,209 @@ function jermGauge(data)
     return data; 
 }
 
+// jermInitSwitch
+function jermSwitchHandler()
+{
+    var handler = new Function(JERM_HANDLER_STR.format(this.activeHandler))
+}
+function jermOverSwitchValue()
+{
+    this.style.cursor = "pointer";
+    this.style.background = this.hoverColor[0];
+    this.style.background = "linear-gradient(to top, "+this.hoverColor[0]+", "+this.hoverColor[1]+")";
+    this.style.opacity = this.hoverOpacity;
+
+}
+function jermLeaveSwitchValue()
+{
+    this.style.cursor = "";
+
+    if (this.mom.switchValue==this.innerHTML)
+    {
+        this.style.background = this.activeColor[0];
+        this.style.background = "linear-gradient(to top, "+this.activeColor[0]+", "+this.activeColor[1]+")";
+    }
+    else
+    {
+        this.style.background = this.normalColor[0];
+        this.style.background = "linear-gradient(to top, "+this.normalColor[0]+", "+this.normalColor[1]+")";
+    }
+
+    this.style.borderColor = this.borderColor;
+    this.style.opacity = "1";
+
+}
+function jermSwitchClicked()
+{
+    if (this.innerHTML==this.mom.switchValue){return 0;}
+    
+    var lastValue = this.mom.switchValue;
+
+    for (var i=0; i<this.mom.children.length; i++)
+    {
+        if (this.mom.children[i].innerHTML==lastValue)
+            {
+                this.mom.children[i].style.fontWeight = "normal";
+                this.mom.children[i].style.color = this.normalTextColor;
+                this.mom.children[i].style.background = this.normalColor[0];
+                this.mom.children[i].style.background = "linear-gradient(to top, "+this.normalColor[0]+", "+this.normalColor[1]+")";
+            
+                break;
+            }
+    }
+
+    this.style.fontWeight = "bold";
+    this.style.color = this.activeTextColor;
+    this.style.background = this.activeColor[0];
+    this.style.background = "linear-gradient(to top, "+this.activeColor[0]+", "+this.activeColor[1]+")";
+
+    this.style.borderColor = this.borderColor;
+    this.style.opacity = "1";
+    
+    this.mom.switchValue = this.innerHTML;
+
+    // emit jermswtich event
+    // NB: the eventHandler takes 2 arguments; lastVaue and currentvalue
+    eval(this.activeHandler+"(lastValue, this.mom.switchValue)");
+}
+
+function jermInitSwitch()
+{
+    var switches = document.getElementsByClassName("jermSwitch");
+
+/*
+    borderRadius="15px"
+    hoverColor="#666 #bbb" 
+    hoverOpacity="0.6" 
+    activeColor="#666 #333" 
+    normalColor="#333 #666"
+    activeTextColor="#fff" 
+    normalTextColor="#666" 
+    activeHandler="logState" -----> this will be givn two arguments; <lastValue/state> and <currentValue/state>
+    states="one two three four ..."
+    value = ""
+
+    NB: you wann set the dimensions(width n height) of the containing element in pixels!
+        also, the mom MUST have an id(i used to get the value whenever it changes...)!
+*/
+
+    for (var i=0; i<switches.length; i++)
+    {
+        var states = switches[i].getAttribute("states") || "Off On";
+        var borderRadius = switches[i].getAttribute("borderRadius") || "20px";
+        var borderColor = switches[i].getAttribute("borderRadius") || "#aaa";
+        var hoverColor = switches[i].getAttribute("hoverColor") || "#888 #333";
+        var hoverOpacity = switches[i].getAttribute("hoverOpacity") || "1";
+        var activeColor = switches[i].getAttribute("activeColor") || "#666 #bbb";
+        var normalColor = switches[i].getAttribute("normalColor") || "#333 #888";
+        var activeTextColor = switches[i].getAttribute("activeTextColor") || "#fff";
+        var normalTextColor = switches[i].getAttribute("normalTextColor") || "#111";
+        var activeHandler = switches[i].getAttribute("activeHandler") || JERM_HANDLER;
+
+        if (activeHandler.indexOf("(")>=0){activeHandler = activeHandler.split("(")[0];}
+
+        var mom = switches[i].getAttribute("id")
+        if (mom==null){console.warn("JermSwitch Element number "+(i+1)+" has no id, operation dumped!"); continue;}
+        mom = document.getElementById(mom);
+        
+        //states
+        states = states.split(" ");
+        if (states.length<2){console.warn("JermSwitch Element number "+(i+1)+" has less than 2 states, operation dumped!"); continue;}
+
+        var switchValue = switches[i].getAttribute("value") || states[0];
+        mom.switchValue = switchValue;
+        
+        switchValueInStates = false;
+        for (var check=0; check<states.length; check++)
+        {
+            if (switchValue==states[check]){switchValueInStates=true; break;}
+        }
+        if(!switchValueInStates){console.warn("JermSwitch Element number "+(i+1)+"; value("+switchValue+") not in states("+states+"), operation dumped!"); continue;}
+
+        hoverOpacity = parseFloat(hoverOpacity);
+        if (isNaN(hoverOpacity)) {console.warn("JermSwitch Element numer "+(i+1)+" has an invalid hoverOpacity, operation dumped!"); continue;}
+
+        // do some necessary processing...
+        borderRadius = borderRadius.split(" ")[0]; // only need one value...
+        hoverColor = hoverColor.split(" ").length==2 ? hoverColor.split(" "): [hoverColor, hoverColor];
+        activeColor = activeColor.split(" ").length==2 ? activeColor.split(" "): [activeColor, activeColor];
+        normalColor = normalColor.split(" ").length==2 ? normalColor.split(" "): [normalColor, normalColor];
+        activeTextColor = activeTextColor.split(" ")[0]; // only need one value...
+        normalTextColor = normalTextColor.split(" ")[0]; // only need one value...
+        
+        for(var state=0; state<states.length; state++)
+        {
+            var jswitch = document.createElement("div");
+            jswitch.innerHTML = states[state];
+
+            jswitch.style.padding = "0px 2px 0px 2px";
+            jswitch.style.textAlign = "center";
+            jswitch.style.float = "left";
+            jswitch.style.height = "100%";
+
+            jswitch.style.borderTop = "1px solid";
+            jswitch.style.borderBottom = "1px solid";
+
+            jswitch.style.lineHeight = (switches[i]).style.height;
+            
+            if (states[state]==switchValue)
+            {
+                jswitch.style.fontWeight = "bold";
+                jswitch.style.color = activeTextColor;
+                jswitch.style.background = activeColor[0];
+                jswitch.style.background = "linear-gradient(to top, "+activeColor[0]+", "+activeColor[1]+")";
+            }
+            else
+            {
+                jswitch.style.color = normalTextColor;
+                jswitch.style.background = normalColor[0];
+                jswitch.style.background = "linear-gradient(to top, "+normalColor[0]+", "+normalColor[1]+")";
+            }
+            
+            if (state==0)
+            {
+                jswitch.style.borderLeft = "1px solid";
+                jswitch.style.borderRadius = borderRadius+" 0px 0px "+borderRadius;
+            }
+            else if (state==(states.length-1))
+            {
+                jswitch.style.border = "1px solid";
+                jswitch.style.borderRadius = "0px "+borderRadius+" "+borderRadius+" 0px";
+            }
+            
+            if (state>0){jswitch.style.borderLeft = "1px solid";}
+
+            jswitch.style.borderColor = borderColor; // you wann set this after setting the color property
+                                                     // because border-color changes as soon as the color property changes
+
+            jswitch.mom = mom;
+
+            jswitch.hoverColor = hoverColor;
+            jswitch.activeColor = activeColor;
+            jswitch.normalColor = normalColor;
+            jswitch.activeTextColor = activeTextColor;
+            jswitch.normalTextColor = normalTextColor;
+            jswitch.borderColor = borderColor;
+            jswitch.hoverOpacity = hoverOpacity;
+
+            jswitch.onmouseenter = jermOverSwitchValue;
+            jswitch.onmouseleave = jermLeaveSwitchValue;
+
+            jswitch.onclick = jermSwitchClicked;
+
+            jswitch.activeHandler = activeHandler;
+
+            switches[i].appendChild(jswitch);
+        }
+    }
+}
+
+
 // init all jermlib custom elements/classes...
 function jermlibInitAll()
 {
     jermInitCollapse();
     jermInitTabbedPanel();
     jermInitMenu(); // tabbed_panels contain menus so you wanna init them first...
+    jermInitSwitch(); 
 }

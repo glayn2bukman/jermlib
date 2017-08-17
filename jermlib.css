@@ -8,15 +8,13 @@
     src:url("fonts/DejaVuSans-ExtraLight.ttf");
 }
 
-body {
-    font-size:100%;
-}
+body {font-size:100%;}
 
 .jermMenu {background-color:#ccc;}
 
 .jermMenuItem:hover, .jermCollapse:hover {cursor:pointer;}
 
 .jermTabbedPanel {}
-.jermTabbedPanelItem {
-    font-family:DejaVuSans-ExtraLight;
-}
+.jermTabbedPanelItem {font-family:DejaVuSans-ExtraLight;}
+
+.jermSwitch {}

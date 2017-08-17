@@ -74,6 +74,8 @@
                 
                 removeMenuItem(i, index);
             }
+
+            function logState(lastValue, value){console.log("changed switch state/value from <"+lastValue+"< to <"+value+">");}
             
             window.onload = function ()
             { 
@@ -162,6 +164,7 @@
         
         <style>
             #verticalMenu {width:20%;}
+            
             .collapses {background-color:#521063;}
             
             #tabbedPanel {position:absolute; width:40%; height:50%}
@@ -174,6 +177,12 @@
     <body>
         <div id="gauge" style="position:absolute; left:50%; width:40%; height:20px;"></div>
         <div id="gauge2" style="position:absolute; bottom:50%; left:50%; width:30px; height:40%;"></div>
+
+        <div id="switch" class="jermSwitch" 
+            states="State-One State-Two Ragga-marphine" value="State-Two"
+            style="position:absolute; left:60%; top:40%; width:20%; height:25px;"
+            activeHandler="logState">
+        </div>
 
         <p>
             <input type="text" id="menuitem0" placeholder="menu item label" />
@@ -248,7 +257,7 @@
         </p>
 
         <div id="tabbedPanel" class="jermTabbedPanel"  activeColor="#009494" 
-         activeBg="#ddd" defaultTab="Tab 3" roundEdges="true">
+         activeBg="#ddd" defaultTab="Tab 3" roundEdges="true" borderRadius="8px 0px 8px 0px">
             <!-- u wanna give each tab-item element a "title" tag. this will be the title of the tab-->
             <div title="Tab 1" class="alignText" style="background-color:#f0f;">Tab 1 contents...</div>
             <div title="Tab 2" class="alignText" style="background-color:#f00;">Tab 2 contents...</div>
