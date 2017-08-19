@@ -878,7 +878,7 @@ function jermInitSwitch()
     states="one two three four ..."
     value = ""
 
-    NB: you wann set the dimensions(width n height) of the containing element in pixels!
+    NB: you wann set the HEIGHT of the containing element in pixels!
         also, the mom MUST have an id(i used to get the value whenever it changes...)!
 */
 
@@ -886,7 +886,7 @@ function jermInitSwitch()
     {
         var states = switches[i].getAttribute("states") || "Off On";
         var borderRadius = switches[i].getAttribute("borderRadius") || "20px";
-        var borderColor = switches[i].getAttribute("borderRadius") || "#aaa";
+        var borderColor = switches[i].getAttribute("borderColor") || "#aaa";
         var hoverColor = switches[i].getAttribute("hoverColor") || "#888 #333";
         var hoverOpacity = switches[i].getAttribute("hoverOpacity") || "1";
         var activeColor = switches[i].getAttribute("activeColor") || "#666 #bbb";
@@ -994,6 +994,71 @@ function jermInitSwitch()
 }
 
 
+
+// jerm-blink...
+function jermBlinkShow(el)
+{
+    if(el.blinkTimeout>=0)
+    {
+        el.blinkingTime += el.showTime;
+        el.blinking = (el.blinkingTime<=el.blinkTimeout) ? true : false;
+    }
+
+    //if (!el.blinking){el.style.display=el.nonBlinkDisplay; return 0;}
+    if (!el.blinking){el.style.visibility="visible"; return 0;}
+    
+    //el.style.display = "none";
+    el.style.visibility = "hidden";
+    setTimeout(jermBlinkHide, el.hideTime*1000, el);
+}
+function jermBlinkHide(el)
+{
+    if(el.blinkTimeout>=0)
+    {
+        el.blinkingTime += el.hideTime;
+        el.blinking = (el.blinkingTime<=el.blinkTimeout) ? true : false;
+    }
+
+    //if (!el.blinking){el.style.display=el.nonBlinkDisplay; return 0;}
+    if (!el.blinking){el.style.visibility="visible"; return 0;}
+    
+    //el.style.display = el.nonBlinkDisplay;
+    el.style.visibility = "visible";
+    setTimeout(jermBlinkShow, el.showTime*1000, el);
+}
+
+function jermBlink(element, show_time, hide_time, timeout)
+    // blink an element...each blink cycle is composed of 2 activities; show the element, then hide the element...
+    // show_time, hide_time and timeout are all in seconds...
+{
+    if (arguments.length==0){console.warn("jermBlink: syntax is jermBlink(element, show_time=.5, hide_time=.5, timeout=-1) but no args given, operation dumped!"); return 0;}
+    if ((typeof element)=="string"){element = document.getElementById(element);}
+    if (element==null) {console.warn("jermBlink: syntax is jermBlink(element, show_time=.5, hide_time=.5, timeout=-1). invalid element given, operation dumped!"); return 0;}
+
+    show_time = show_time || 0.15;
+    hide_time = hide_time || 0.15;
+    timeout = timeout || -1; // blink indefinetly
+
+    if (isNaN(show_time) || isNaN(hide_time) || isNaN(timeout))
+    {
+        console.warn("invalid show_time or hide_time given for jermBlink; using defaults(0.5)");
+
+        show_time = isNaN(show_time) ? 0.15 : show_time;
+        hide_time = isNaN(hide_time) ? 0.15 : hide_time;
+        timeout = isNaN(timeout) ? -1 : timeout;
+    }
+
+    //element.nonBlinkDisplay = element.style.display; // you wanna preserve this display, trust me    
+    element.blinking = true; // set this to false to terminate the blinking effect... 
+
+    element.showTime = show_time;
+    element.hideTime = hide_time;
+    element.blinkTimeout = timeout;
+    element.blinkingTime = 0;
+
+    setTimeout(jermBlinkShow, element.showTime*1000, element);
+}
+
 // init all jermlib custom elements/classes...
 function jermlibInitAll()
 {
@@ -1001,4 +1066,7 @@ function jermlibInitAll()
     jermInitTabbedPanel();
     jermInitMenu(); // tabbed_panels contain menus so you wanna init them first...
     jermInitSwitch(); 
+
+    jermBlink("gauge2", null, null, 10);
+    //setTimeout(function(){document.getElementById("gauge2").blinking = false;}, 10000);
 }

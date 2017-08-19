@@ -180,8 +180,12 @@
 
         <div id="switch" class="jermSwitch" 
             states="State-One State-Two Ragga-marphine" value="State-Two"
-            style="position:absolute; left:60%; top:40%; width:20%; height:25px;"
-            activeHandler="logState">
+            style="position:absolute; left:60%; top:40%; height:25px;"
+            borderRadius="8px" activeHandler="logState"> 
+            <!-- 
+                * the activeHandler takes two arguments <lastvalue> and <newvalue>
+                * you want to set the height in px not % otherwise the labels wont be vertically placed!
+            -->
         </div>
 
         <p>
